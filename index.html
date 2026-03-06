@@ -78,10 +78,11 @@
 
   .week-grid {
     display: grid;
-    grid-template-columns: 70px repeat(6, 1fr);
+    grid-template-columns: 55px repeat(6, minmax(120px, 1fr));
     gap: 2px;
     max-width: 1100px;
     margin: 0 auto;
+    overflow-x: auto;
   }
 
   .day-header {
@@ -147,7 +148,7 @@
     transition: transform 0.15s, box-shadow 0.15s;
     cursor: default;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .block:hover {
@@ -181,27 +182,31 @@
   }
 
   .block .block-emoji {
-    font-size: 14px;
+    font-size: 13px;
     display: block;
     margin-bottom: 2px;
   }
 
   .block .block-title {
     font-weight: 700;
-    font-size: 11px;
+    font-size: 10px;
     margin-bottom: 1px;
+    word-break: keep-all;
+    white-space: normal;
   }
 
   .block .block-time {
     font-size: 9px;
     opacity: 0.7;
     font-family: 'Gmarket Sans', sans-serif;
+    white-space: nowrap;
   }
 
   .block .block-detail {
-    font-size: 10px;
+    font-size: 9px;
     opacity: 0.8;
     margin-top: 2px;
+    word-break: keep-all;
   }
 
   /* Block types */
@@ -222,13 +227,13 @@
   .b-instatoon { background: linear-gradient(135deg, #2a1a3a, #1a0d2a); border-color: #7a3d9a; color: #da77ff; }
   .b-extra   { background: linear-gradient(135deg, #1a2a1a, #0d1a0d); border-color: #3d7a3d; color: #7dda77; }
 
-  .h56  { height: 56px; }
-  .h28  { height: 28px; }
-  .h42  { height: 42px; }
-  .h84  { height: 84px; }
-  .h112 { height: 112px; }
-  .h168 { height: 168px; }
-  .h196 { height: 196px; }
+  .h56  { min-height: 56px; height: auto; }
+  .h28  { min-height: 38px; height: auto; }
+  .h42  { min-height: 48px; height: auto; }
+  .h84  { min-height: 84px; height: auto; }
+  .h112 { min-height: 112px; height: auto; }
+  .h168 { min-height: 168px; height: auto; }
+  .h196 { min-height: 196px; height: auto; }
 
   .today-badge {
     display: inline-block;
