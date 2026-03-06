@@ -484,10 +484,13 @@
   </div>
 </div>
 
-<!-- Reset button -->
-<div style="text-align:center; margin-top: 32px;">
-  <button onclick="resetAll()" style="background:#1a1a1a; border:1px solid #333; color:#666; padding:10px 24px; border-radius:20px; cursor:pointer; font-family:'Noto Sans KR'; font-size:13px; transition:all 0.2s;">
+<!-- Reset button + Edit button -->
+<div style="text-align:center; margin-top: 32px; display:flex; gap:12px; justify-content:center;">
+  <button onclick="resetAll()" style="background:#1a1a1a; border:1px solid #333; color:#666; padding:10px 24px; border-radius:20px; cursor:pointer; font-family:'Noto Sans KR'; font-size:13px;">
     🔄 체크 초기화
+  </button>
+  <button onclick="toggleEditMode()" id="edit-btn" style="background:#1a1a2e; border:1px solid #4444aa; color:#a29bfe; padding:10px 24px; border-radius:20px; cursor:pointer; font-family:'Noto Sans KR'; font-size:13px;">
+    ✏️ 편집 모드
   </button>
 </div>
 
@@ -552,6 +555,99 @@
     });
     updateProgress();
   }
+
+  // 편집 모드
+  let editMode = false;
+
+  function toggleEditMode() {
+    editMode = !editMode;
+    const btn = document.getElementById('edit-btn');
+
+    if (editMode) {
+      btn.textContent = '💾 저장하기';
+      btn.style.background = '#1a3a1a';
+      btn.style.borderColor = '#4a9a4a';
+      btn.style.color = '#74c69d';
+
+      // 모든 블록 편집 가능하게
+      document.querySelectorAll('.block').forEach(block => {
+        block.style.cursor = 'text';
+
+        const title = block.querySelector('.block-title');
+        const time = block.querySelector('.block-time');
+        const detail = block.querySelector('.block-detail');
+        const emoji = block.querySelector('.block-emoji');
+
+        if (title) title.contentEditable = 'true';
+        if (time) time.contentEditable = 'true';
+        if (detail) detail.contentEditable = 'true';
+        if (emoji) emoji.contentEditable = 'true';
+
+        // 편집 중엔 체크 비활성화
+        block.onclick = null;
+      });
+
+    } else {
+      btn.textContent = '✏️ 편집 모드';
+      btn.style.background = '#1a1a2e';
+      btn.style.borderColor = '#4444aa';
+      btn.style.color = '#a29bfe';
+
+      // 수정 내용 저장 + 편집 종료
+      document.querySelectorAll('.block').forEach((block, i) => {
+        block.style.cursor = 'pointer';
+
+        const title = block.querySelector('.block-title');
+        const time = block.querySelector('.block-time');
+        const detail = block.querySelector('.block-detail');
+        const emoji = block.querySelector('.block-emoji');
+
+        // localStorage에 내용 저장
+        const saved = {
+          title: title ? title.innerText : '',
+          time: time ? time.innerText : '',
+          detail: detail ? detail.innerText : '',
+          emoji: emoji ? emoji.innerText : ''
+        };
+        localStorage.setItem('content-block-' + i, JSON.stringify(saved));
+
+        if (title) title.contentEditable = 'false';
+        if (time) time.contentEditable = 'false';
+        if (detail) detail.contentEditable = 'false';
+        if (emoji) emoji.contentEditable = 'false';
+
+        // 체크 기능 복원
+        block.onclick = () => {
+          if (editMode) return;
+          block.classList.toggle('done');
+          if (block.classList.contains('done')) {
+            localStorage.setItem(block.dataset.id, 'done');
+          } else {
+            localStorage.removeItem(block.dataset.id);
+          }
+          updateProgress();
+        };
+      });
+
+      alert('✅ 저장됐어요! 다음에 열어도 유지돼요 😊');
+    }
+  }
+
+  // 저장된 편집 내용 불러오기
+  document.querySelectorAll('.block').forEach((block, i) => {
+    const saved = localStorage.getItem('content-block-' + i);
+    if (saved) {
+      const data = JSON.parse(saved);
+      const title = block.querySelector('.block-title');
+      const time = block.querySelector('.block-time');
+      const detail = block.querySelector('.block-detail');
+      const emoji = block.querySelector('.block-emoji');
+      if (title && data.title) title.innerText = data.title;
+      if (time && data.time) time.innerText = data.time;
+      if (detail && data.detail) detail.innerText = data.detail;
+      if (emoji && data.emoji) emoji.innerText = data.emoji;
+    }
+  });
 
   updateProgress();
 </script>
