@@ -156,6 +156,30 @@
     z-index: 5;
   }
 
+  .block {
+    cursor: pointer;
+  }
+
+  .block.done {
+    opacity: 0.4;
+    filter: grayscale(0.6);
+  }
+
+  .block.done::after {
+    content: '✅';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    opacity: 1;
+    filter: none;
+  }
+
+  .block.done .block-title {
+    text-decoration: line-through;
+  }
+
   .block .block-emoji {
     font-size: 14px;
     display: block;
@@ -416,6 +440,17 @@
 
 </div>
 
+<!-- Progress bar -->
+<div style="max-width:1100px; margin: 32px auto 16px; background:#16161a; border:1px solid #2a2a35; border-radius:12px; padding:16px 20px;">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+    <span id="progress-text" style="font-family:'Gmarket Sans'; font-size:13px; color:#aaa;">오늘 진행률 0%</span>
+    <span style="font-size:11px; color:#555;">블록 클릭하면 완료 체크!</span>
+  </div>
+  <div style="background:#222; border-radius:20px; height:8px; overflow:hidden;">
+    <div id="progress-bar-inner" style="height:100%; width:0%; background:linear-gradient(90deg,#ff6b35,#ffe66d,#4ecdc4); border-radius:20px; transition:width 0.4s ease;"></div>
+  </div>
+</div>
+
 <!-- Summary bar -->
 <div class="summary-bar">
   <div class="summary-card">
@@ -444,6 +479,56 @@
     <div class="s-value" style="color:#74c69d">4h</div>
   </div>
 </div>
+
+<!-- Reset button -->
+<div style="text-align:center; margin-top: 32px;">
+  <button onclick="resetAll()" style="background:#1a1a1a; border:1px solid #333; color:#666; padding:10px 24px; border-radius:20px; cursor:pointer; font-family:'Noto Sans KR'; font-size:13px; transition:all 0.2s;">
+    🔄 체크 초기화
+  </button>
+</div>
+
+<script>
+  // 각 블록에 고유 ID 부여
+  document.querySelectorAll('.block').forEach((block, i) => {
+    const id = 'block-' + i;
+    block.dataset.id = id;
+
+    // 저장된 상태 불러오기
+    if (localStorage.getItem(id) === 'done') {
+      block.classList.add('done');
+    }
+
+    // 클릭 시 토글
+    block.addEventListener('click', () => {
+      block.classList.toggle('done');
+      if (block.classList.contains('done')) {
+        localStorage.setItem(id, 'done');
+      } else {
+        localStorage.removeItem(id);
+      }
+      updateProgress();
+    });
+  });
+
+  // 진행률 업데이트
+  function updateProgress() {
+    const total = document.querySelectorAll('.block').length;
+    const done = document.querySelectorAll('.block.done').length;
+    const pct = Math.round((done / total) * 100);
+    document.getElementById('progress-text').textContent = `오늘 진행률 ${pct}% (${done}/${total})`;
+    document.getElementById('progress-bar-inner').style.width = pct + '%';
+  }
+
+  function resetAll() {
+    document.querySelectorAll('.block').forEach(block => {
+      block.classList.remove('done');
+      localStorage.removeItem(block.dataset.id);
+    });
+    updateProgress();
+  }
+
+  updateProgress();
+</script>
 
 </body>
 </html>
