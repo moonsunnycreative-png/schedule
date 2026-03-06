@@ -302,29 +302,28 @@
   <div style="height:52px"></div>
 
   <!-- Day headers -->
-  <div class="day-header mon">
+  <div class="day-header mon" id="day-mon">
     <div class="day-name">월</div>
     <div class="day-sub">MON</div>
     <div class="today-badge">🍺 회화수업</div>
   </div>
-  <div class="day-header tue">
+  <div class="day-header tue" id="day-tue">
     <div class="day-name">화</div>
     <div class="day-sub">TUE</div>
   </div>
-  <div class="day-header wed">
+  <div class="day-header wed" id="day-wed">
     <div class="day-name">수</div>
     <div class="day-sub">WED</div>
   </div>
-  <div class="day-header thu" style="border: 1px solid var(--accent4);">
+  <div class="day-header thu" id="day-thu">
     <div class="day-name">목</div>
     <div class="day-sub">THU</div>
-    <div class="today-badge">TODAY</div>
   </div>
-  <div class="day-header fri">
+  <div class="day-header fri" id="day-fri">
     <div class="day-name">금</div>
     <div class="day-sub">FRI</div>
   </div>
-  <div class="day-header sat">
+  <div class="day-header sat" id="day-sat">
     <div class="day-name">토</div>
     <div class="day-sub">SAT</div>
   </div>
@@ -493,6 +492,28 @@
 </div>
 
 <script>
+  // 오늘 요일 자동 감지 (0=일, 1=월, 2=화, 3=수, 4=목, 5=금, 6=토)
+  const dayMap = { 1: 'mon', 2: 'tue', 3: 'wed', 4: 'thu', 5: 'fri', 6: 'sat' };
+  const todayNum = new Date().getDay();
+  const todayKey = dayMap[todayNum];
+
+  if (todayKey) {
+    const todayHeader = document.getElementById('day-' + todayKey);
+    if (todayHeader) {
+      todayHeader.style.border = '1px solid var(--accent4)';
+      // 월요일이면 회화수업 뱃지 유지, 나머지는 TODAY 뱃지 추가
+      if (todayKey === 'mon') {
+        const badge = todayHeader.querySelector('.today-badge');
+        if (badge) badge.innerHTML = '🍺 회화수업 · TODAY';
+      } else {
+        const badge = document.createElement('div');
+        badge.className = 'today-badge';
+        badge.textContent = 'TODAY';
+        todayHeader.appendChild(badge);
+      }
+    }
+  }
+
   // 각 블록에 고유 ID 부여
   document.querySelectorAll('.block').forEach((block, i) => {
     const id = 'block-' + i;
